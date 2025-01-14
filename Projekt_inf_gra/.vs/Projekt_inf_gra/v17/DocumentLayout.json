@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\jopek\\OneDrive\\Pulpit\\Projekt_Informatyka_2024_2025\\Projekt_inf_gra\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B4AED5-10D4-404A-AC4D-399216D290FC}|Projekt_inf_gra.vcxproj|C:\\Users\\jopek\\OneDrive\\Pulpit\\Projekt_Informatyka_2024_2025\\Projekt_inf_gra\\FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F3B4AED5-10D4-404A-AC4D-399216D290FC}|Projekt_inf_gra.vcxproj|solutionrelative:FileName.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FileName.cpp",
+              "DocumentMoniker": "C:\\Users\\jopek\\OneDrive\\Pulpit\\Projekt_Informatyka_2024_2025\\Projekt_inf_gra\\FileName.cpp",
+              "RelativeDocumentMoniker": "FileName.cpp",
+              "ToolTip": "C:\\Users\\jopek\\OneDrive\\Pulpit\\Projekt_Informatyka_2024_2025\\Projekt_inf_gra\\FileName.cpp",
+              "RelativeToolTip": "FileName.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAALsAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-01-14T15:42:41.18Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
