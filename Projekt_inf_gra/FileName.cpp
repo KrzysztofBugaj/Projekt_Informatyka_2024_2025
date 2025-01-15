@@ -5,7 +5,7 @@
 #include <ctime>
 #include <cstdlib>
 
-
+//-------------------------------------------------------
 using namespace sf;
 
 // Definicje sta³ych
