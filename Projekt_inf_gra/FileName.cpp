@@ -5,7 +5,7 @@
 #include <ctime>
 #include <cstdlib>
 
-//-------------------------------------------------------
+
 using namespace sf;
 
 // Definicje sta³ych
@@ -16,21 +16,80 @@ constexpr float szerokoscCegielki{ 60.f }, wysokoscCegielki{ 20.f };
 constexpr int liczbaCegielekX{ 11 }, liczbaCegielekY{ 4 };
 
 // Klasa reprezentuj¹ca pi³kê
+//class Pilka {
+//public:
+//    CircleShape ksztalt;
+//    Vector2f predkosc{ -predkoscPilki, -predkoscPilki };
+//
+//    Pilka(float x, float y) {
+//        ksztalt.setPosition(x, y);
+//        ksztalt.setRadius(promienPilki);
+//        ksztalt.setFillColor(Color::Red);
+//        ksztalt.setOrigin(promienPilki, promienPilki);
+//    }
+//
+//    // Aktualizacja pozycji pi³ki
+//    void aktualizuj() {
+//        ksztalt.move(predkosc);
+//
+//        // Odbicie od œcian bocznych
+//        if (lewo() < 0)
+//            predkosc.x = predkoscPilki;
+//        else if (prawo() > szerokoscOkna)
+//            predkosc.x = -predkoscPilki;
+//
+//        // Odbicie od górnej œciany
+//        if (gora() < 0)
+//            predkosc.y = predkoscPilki;
+//        else if (dol() > wysokoscOkna)
+//            predkosc.y = -predkoscPilki;
+//    }
+//
+//    // Funkcje pomocnicze do uzyskania pozycji krawêdzi pi³ki
+//    float x() { return ksztalt.getPosition().x; }
+//    float y() { return ksztalt.getPosition().y; }
+//    float lewo() { return x() - ksztalt.getRadius(); }
+//    float prawo() { return x() + ksztalt.getRadius(); }
+//    float gora() { return y() - ksztalt.getRadius(); }
+//    float dol() { return y() + ksztalt.getRadius(); }
+//};
+
 class Pilka {
 public:
     CircleShape ksztalt;
     Vector2f predkosc{ -predkoscPilki, -predkoscPilki };
 
+    sf::Texture tekstura3, tekstura4; // Tekstury pi³ki
+    sf::Sprite sprite;               // Sprite dla pi³ki
+    bool pokazTekstura3 = true;      // Flaga dla aktualnej tekstury
+    sf::Clock zegar;                 // Zegar do zmiany tekstur
+    float czasZmiany = 0.5f;         // Interwa³ czasowy zmiany tekstury (w sekundach)
+
     Pilka(float x, float y) {
+        // Inicjalizacja kszta³tu pi³ki
         ksztalt.setPosition(x, y);
         ksztalt.setRadius(promienPilki);
         ksztalt.setFillColor(Color::Red);
         ksztalt.setOrigin(promienPilki, promienPilki);
+
+        // Za³aduj tekstury
+        if (!tekstura3.loadFromFile("ballBlue.png") || !tekstura4.loadFromFile("ballGrey.png")) {
+            std::cerr << "Nie uda³o siê za³adowaæ tekstur!" << std::endl;
+            exit(EXIT_FAILURE); // Jeœli nie uda siê za³adowaæ tekstur, zakoñcz program
+        }
+
+        sprite.setTexture(tekstura3); // Ustaw pocz¹tkow¹ teksturê
+        sprite.setPosition(x, y);     // Ustaw pozycjê sprite
+
+        // Dostosuj rozmiar sprite'a do rozmiaru pi³ki
+        sprite.setScale(2.f * promienPilki / tekstura3.getSize().x, 2.f * promienPilki / tekstura3.getSize().y);
     }
 
-    // Aktualizacja pozycji pi³ki
     void aktualizuj() {
+        // Zmieniaj pozycjê pi³ki
         ksztalt.move(predkosc);
+        sprite.setPosition(ksztalt.getPosition()); // Synchronizowanie pozycji sprite z ksztaltem
+        sprite.move(predkosc); // Synchronizacja pozycji sprite
 
         // Odbicie od œcian bocznych
         if (lewo() < 0)
@@ -43,6 +102,18 @@ public:
             predkosc.y = predkoscPilki;
         else if (dol() > wysokoscOkna)
             predkosc.y = -predkoscPilki;
+
+        // Zmieniaj tekstury co okreœlony czas
+        if (zegar.getElapsedTime().asSeconds() > czasZmiany) {
+            if (pokazTekstura3) {
+                sprite.setTexture(tekstura4);
+            }
+            else {
+                sprite.setTexture(tekstura3);
+            }
+            pokazTekstura3 = !pokazTekstura3; // Prze³¹cz teksturê
+            zegar.restart();                 // Zresetuj zegar
+        }
     }
 
     // Funkcje pomocnicze do uzyskania pozycji krawêdzi pi³ki
@@ -52,7 +123,13 @@ public:
     float prawo() { return x() + ksztalt.getRadius(); }
     float gora() { return y() - ksztalt.getRadius(); }
     float dol() { return y() + ksztalt.getRadius(); }
+
+    // Funkcja do rysowania pi³ki
+    void rysuj(sf::RenderWindow& window) {
+        window.draw(sprite); // Rysuj sprite
+    }
 };
+
 
 // Klasa bazowa reprezentuj¹ca prostok¹t (u¿ywana przez paletkê i cegie³ki)
 class Prostokat {
@@ -203,10 +280,10 @@ public:
         tloSprite.setTexture(tloTekstura);
 
         tekstKoniecGry.setFont(czcionka);
-                tekstKoniecGry.setString("Koniec Gry");
-                tekstKoniecGry.setCharacterSize(100);
-                tekstKoniecGry.setFillColor(Color::Red);
-                tekstKoniecGry.setPosition(szerokosc / 2 - tekstKoniecGry.getGlobalBounds().width / 2, wysokosc / 6);
+        tekstKoniecGry.setString("Koniec Gry");
+        tekstKoniecGry.setCharacterSize(100);
+        tekstKoniecGry.setFillColor(Color::Red);
+        tekstKoniecGry.setPosition(szerokosc / 2 - tekstKoniecGry.getGlobalBounds().width / 2, wysokosc / 6);
 
         opcje[0].setFont(czcionka);
         opcje[0].setString("Nowa gra");
@@ -244,31 +321,31 @@ public:
 
 
 
-void ruchWGore() {
-    if (wybranaOpcja - 1 >= 0) {
-        opcje[wybranaOpcja].setFillColor(Color::Blue);
-        wybranaOpcja--;
-        opcje[wybranaOpcja].setFillColor(Color::Red);
+    void ruchWGore() {
+        if (wybranaOpcja - 1 >= 0) {
+            opcje[wybranaOpcja].setFillColor(Color::Blue);
+            wybranaOpcja--;
+            opcje[wybranaOpcja].setFillColor(Color::Red);
+        }
     }
-}
 
-void ruchWDol() {
-    if (wybranaOpcja + 1 < MAX_OPCJE) {
-        opcje[wybranaOpcja].setFillColor(Color::Blue);
-        wybranaOpcja++;
-        opcje[wybranaOpcja].setFillColor(Color::Red);
+    void ruchWDol() {
+        if (wybranaOpcja + 1 < MAX_OPCJE) {
+            opcje[wybranaOpcja].setFillColor(Color::Blue);
+            wybranaOpcja++;
+            opcje[wybranaOpcja].setFillColor(Color::Red);
+        }
     }
-}
 
-int pobierzWybranaOpcje() {
-    return wybranaOpcja;
-}
+    int pobierzWybranaOpcje() {
+        return wybranaOpcja;
+    }
 
 private:
     static const int MAX_OPCJE = 3;
     int wybranaOpcja;
     Text opcje[MAX_OPCJE];
-    
+
 
     // Nowe pola dla t³a
     sf::Texture tloTekstura;
@@ -364,12 +441,12 @@ private:
 class Instrukcja {
 public:
     // Konstruktor wczytuj¹cy teksturê i tworz¹cy sprite
-    Instrukcja(const std::string& ) {
+    Instrukcja(const std::string&) {
         if (!tekstura.loadFromFile("arkanoid_readme_image1.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ obrazka instrukcji!" << std::endl;
         }
         sprite.setTexture(tekstura);  // Przypisanie tekstury do sprite'a
-        sprite.setPosition(0,0);  // Ustawienie pozycji obrazka
+        sprite.setPosition(0, 0);  // Ustawienie pozycji obrazka
     }
 
     // Funkcja do rysowania instrukcji
@@ -675,7 +752,7 @@ int main() {
                     StanGry::Cegielka stanCegielki = {
                         cegielka.x(),
                         cegielka.y(),
-                        cegielka.aktywna 
+                        cegielka.aktywna
                     };
                     stanGry.cegielki.push_back(stanCegielki);
                 }
@@ -704,7 +781,8 @@ int main() {
 
             }
             else {
-                okno.draw(pilka.ksztalt);
+                pilka.rysuj(okno);
+                /*okno.draw(pilka.ksztalt);*/
                 okno.draw(paletka.ksztalt);
                 for (const auto& cegielka : cegielki) {
                     okno.draw(cegielka.ksztalt);
@@ -714,7 +792,7 @@ int main() {
 
         okno.display();
     }
-        
+
     return 0;
 }
 
