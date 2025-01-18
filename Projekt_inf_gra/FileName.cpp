@@ -149,11 +149,19 @@ public:
 class Paletka : public Prostokat {
 public:
     Vector2f predkosc;
+    Texture tekstura5; // Zmienna do przechowywania tekstury
 
     Paletka(float x, float y) {
         ksztalt.setPosition(x, y);
         ksztalt.setSize({ szerokoscPaletki, wysokoscPaletki });
         ksztalt.setFillColor(Color::Red);
+        //// Za³aduj teksturê i przypisz j¹ do obiektu ksztalt
+        //if (!tekstura5.loadFromFile("paddleRed.png")) {
+        //    // Obs³uga b³êdu, jeœli tekstura siê nie za³aduje
+        //    std::cout << "Nie uda³o siê za³adowaæ tekstury!" << std::endl;
+        //}
+        //ksztalt.setTexture(&tekstura5); // Przypisanie tekstury do kszta³tu
+
         ksztalt.setOrigin(szerokoscPaletki / 2.f, wysokoscPaletki / 2.f);
     }
 
