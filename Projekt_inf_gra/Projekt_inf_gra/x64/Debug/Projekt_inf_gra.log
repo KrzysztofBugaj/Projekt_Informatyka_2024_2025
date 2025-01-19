@@ -1,1 +1,6 @@
-﻿  Projekt_inf_gra.vcxproj -> C:\Users\jopek\OneDrive\Pulpit\Projekt_Informatyka_2024_2025\Projekt_inf_gra\x64\Debug\Projekt_inf_gra.exe
+﻿  Program_Glowny.cpp
+C:\Users\jopek\OneDrive\Pulpit\Projekt_inf_gra\Program_Glowny.cpp(162,93): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jopek\OneDrive\Pulpit\Projekt_inf_gra\Program_Glowny.cpp(174,87): warning C4244: "argument": konwersja z "double" do "float", możliwa utrata danych
+  Test2.cpp
+  Generowanie kodu...
+  Projekt_inf_gra.vcxproj -> C:\Users\jopek\OneDrive\Pulpit\Projekt_inf_gra\x64\Debug\Projekt_inf_gra.exe
