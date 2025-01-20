@@ -8,7 +8,7 @@
 
 using namespace sf;
 
-// Definicje sta³ych
+//Definicje sta³ych
 constexpr int szerokoscOkna{ 800 }, wysokoscOkna{ 600 };
 constexpr float promienPilki{ 10.f }, predkoscPilki{ 4.0f };
 constexpr float szerokoscPaletki{ 100.f }, wysokoscPaletki{ 20.f }, predkoscPaletki{ 8.0f };
@@ -16,126 +16,8 @@ constexpr float szerokoscCegielki{ 60.f }, wysokoscCegielki{ 20.f };
 constexpr int liczbaCegielekX{ 11 }, liczbaCegielekY{ 4 };
 
 
-//----------------------------------------------------------------------
-
 enum PoziomTrudnosci { LATWY, SREDNI, TRUDNY };
 
-class PoziomTrudnosciParametry {
-public:
-    static constexpr float predkoscPilkiLatwy{ 4.0f }, predkoscPilkiSredni{ 6.0f }, predkoscPilkiTrudny{ 8.0f };
-    static constexpr float predkoscPaletkiLatwy{ 10.0f }, predkoscPaletkiSredni{ 8.0f }, predkoscPaletkiTrudny{ 6.0f };
-    static constexpr int liczbaCegielekXLatwy{ 8 }, liczbaCegielekXSredni{ 11 }, liczbaCegielekXTrudny{ 14 };
-    static constexpr int liczbaCegielekYLatwy{ 3 }, liczbaCegielekYSredni{ 4 }, liczbaCegielekYTrudny{ 5 };
-
-    static float pobierzPredkoscPilki(PoziomTrudnosci poziom) {
-        switch (poziom) {
-        case LATWY: return predkoscPilkiLatwy;
-        case SREDNI: return predkoscPilkiSredni;
-        case TRUDNY: return predkoscPilkiTrudny;
-        default: return predkoscPilkiLatwy;
-        }
-    }
-
-    static float pobierzPredkoscPaletki(PoziomTrudnosci poziom) {
-        switch (poziom) {
-        case LATWY: return predkoscPaletkiLatwy;
-        case SREDNI: return predkoscPaletkiSredni;
-        case TRUDNY: return predkoscPaletkiTrudny;
-        default: return predkoscPaletkiLatwy;
-        }
-    }
-
-    static int pobierzLiczbeCegielekX(PoziomTrudnosci poziom) {
-        switch (poziom) {
-        case LATWY: return liczbaCegielekXLatwy;
-        case SREDNI: return liczbaCegielekXSredni;
-        case TRUDNY: return liczbaCegielekXTrudny;
-        default: return liczbaCegielekXLatwy;
-        }
-    }
-
-    static int pobierzLiczbeCegielekY(PoziomTrudnosci poziom) {
-        switch (poziom) {
-        case LATWY: return liczbaCegielekYLatwy;
-        case SREDNI: return liczbaCegielekYSredni;
-        case TRUDNY: return liczbaCegielekYTrudny;
-        default: return liczbaCegielekYLatwy;
-        }
-    }
-};
-
-class WybórPoziomuTrudnoœci {
-private:
-    int wybranaOpcja;
-    const int liczbaOpcji = 3;
-    Text teksty[3];
-    Font font;
-    PoziomTrudnosci poziomTrudnosci;
-
-public:
-    WybórPoziomuTrudnoœci() : wybranaOpcja(0), poziomTrudnosci(LATWY) {
-        if (!font.loadFromFile("Arial.ttf")) {
-            std::cerr << "Nie uda³o siê za³adowaæ czcionki!" << std::endl;
-        }
-
-        teksty[0].setString("Latwy");
-        teksty[1].setString("Sredni");
-        teksty[2].setString("Trudny");
-
-        for (int i = 0; i < liczbaOpcji; ++i) {
-            teksty[i].setFont(font);
-            teksty[i].setCharacterSize(24);
-            teksty[i].setFillColor(Color::White);
-            teksty[i].setPosition(300, 150 + i * 50);
-        }
-    }
-
-    void rysuj(RenderWindow& okno) {
-        for (int i = 0; i < liczbaOpcji; ++i) {
-            if (i == wybranaOpcja) {
-                teksty[i].setFillColor(Color::Green);
-            }
-            else {
-                teksty[i].setFillColor(Color::White);
-            }
-            okno.draw(teksty[i]);
-        }
-    }
-
-    void ruchWGore() {
-        if (wybranaOpcja > 0) {
-            wybranaOpcja--;
-        }
-    }
-
-    void ruchWDol() {
-        if (wybranaOpcja < liczbaOpcji - 1) {
-            wybranaOpcja++;
-        }
-    }
-
-    PoziomTrudnosci pobierzWybranyPoziom() {
-        switch (wybranaOpcja) {
-        case 0: return LATWY;
-        case 1: return SREDNI;
-        case 2: return TRUDNY;
-        default: return LATWY;
-        }
-    }
-
-    void ustawPoziomTrudnosci(PoziomTrudnosci poziom) {
-        poziomTrudnosci = poziom;
-    }
-
-    PoziomTrudnosci getPoziomTrudnosci() const {
-        return poziomTrudnosci;
-    }
-};
-
-
-
-
-//---------------------------------------------------------------
 
 class Pilka {
 public:
@@ -609,17 +491,11 @@ private:
 
 class StanGry {
 public:
-    // Pozycje pi³ki
-    float pozycjaPilkiX;
-    float pozycjaPilkiY;
 
     // Pozycje paletki
     float pozycjaPaletkiX;
     float pozycjaPaletkiY;
 
-    // Prêdkoœæ pi³ki
-    float predkoscPilkiX;
-    float predkoscPilkiY;
 
     // Czas gry
     float czasGry;  // Czas gry w sekundach
@@ -635,9 +511,7 @@ public:
     void zapiszStanDoPliku(const std::string& Nazwapliku) {
         std::ofstream plik(Nazwapliku);
         if (plik.is_open()) {
-            // Zapis pi³ki
-            plik << pozycjaPilkiX << " " << pozycjaPilkiY << std::endl;
-            plik << predkoscPilkiX << " " << predkoscPilkiY << std::endl;
+            ;
 
             // Zapis paletki
             plik << pozycjaPaletkiX << " " << pozycjaPaletkiY << std::endl;
@@ -663,9 +537,6 @@ public:
     void odczytajStanZPliku(const std::string& Nazwapliku) {
         std::ifstream plik(Nazwapliku);
         if (plik.is_open()) {
-            // Odczyt pi³ki
-            plik >> pozycjaPilkiX >> pozycjaPilkiY;
-            plik >> predkoscPilkiX >> predkoscPilkiY;
 
             // Odczyt paletki
             plik >> pozycjaPaletkiX >> pozycjaPaletkiY;
@@ -784,14 +655,53 @@ private:
     sf::Sprite tloSprite;
 };
 
+class Opuscprogram {
+public:
+    Text tekstOpuscprogram;
+    Text tekstInstrukcja;
+    Font czcionka;
 
-void zresetujStany(bool& graRozpoczeta, bool& koniecGry, bool& pokazInstrukcje, bool& pokazInstrukcje2, bool& wygrana) {
-    graRozpoczeta = false;
-    koniecGry = false;
-    pokazInstrukcje = false;
-    pokazInstrukcje2 = false;
-    wygrana = false;
-}
+    Opuscprogram(float szerokosc, float wysokosc) {
+        if (!czcionka.loadFromFile("freshface.ttf")) {
+            exit(EXIT_FAILURE);
+        }
+
+        // £adowanie tekstury t³a
+        if (!tloTekstura.loadFromFile("kosmos.png")) {
+            std::cerr << "Nie uda³o siê za³adowaæ tekstury t³a!" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        tloSprite.setTexture(tloTekstura);
+
+        // Konfiguracja tekstu "Wygrana"
+        tekstOpuscprogram.setFont(czcionka);
+        tekstOpuscprogram.setString("Chcesz wyjsc z gry?");
+        tekstOpuscprogram.setCharacterSize(100);
+        tekstOpuscprogram.setFillColor(Color::Red);
+        tekstOpuscprogram.setPosition(szerokosc / 2 - tekstOpuscprogram.getGlobalBounds().width / 2, wysokosc / 4);
+
+        // Konfiguracja tekstu instrukcji
+        tekstInstrukcja.setFont(czcionka);
+        tekstInstrukcja.setString("Tak - kliknij T / Nie - kliknij Escape");
+        tekstInstrukcja.setCharacterSize(30);
+        tekstInstrukcja.setFillColor(Color::Blue);
+        tekstInstrukcja.setPosition(szerokosc / 2 - tekstInstrukcja.getGlobalBounds().width / 2, wysokosc / 2);
+    }
+
+    void rysuj(RenderWindow& okno) {
+        // Rysuj t³o
+        okno.draw(tloSprite);
+
+        // Rysuj teksty
+        okno.draw(tekstOpuscprogram);
+        okno.draw(tekstInstrukcja);
+    }
+
+private:
+    sf::Texture tloTekstura;
+    sf::Sprite tloSprite;
+};
 
 
 int main() {
@@ -809,34 +719,26 @@ int main() {
     Menu menu(szerokoscOkna, wysokoscOkna);
     Pilka pilka(szerokoscOkna / 2, wysokoscOkna / 2);
     Paletka paletka(szerokoscOkna / 2, wysokoscOkna - 50);
-    std::vector<Cegielka> cegielki;
+    KoniecGry ekranKoniecGry(szerokoscOkna, wysokoscOkna);
+    Wygrana ekranWygrana(szerokoscOkna, wysokoscOkna);
 
-    for (int iX = 0; iX < liczbaCegielekX; ++iX) {
-        for (int iY = 0; iY < liczbaCegielekY; ++iY) {
-            cegielki.emplace_back(
-                (iX + 1) * (szerokoscCegielki + 3) + 22,
-                (iY + 2) * (wysokoscCegielki + 3)
-            );
-        }
-    }
+    Opuscprogram opuscProgram(szerokoscOkna, wysokoscOkna);
+
+
+    std::vector<Cegielka> cegielki;
 
     bool graRozpoczeta = false;
     bool pokazInstrukcje = false;
     bool pokazInstrukcje2 = false;
     bool koniecGry = false;
     bool wygrana = false;
-    bool resetGry = false;
-
     bool poziomWybierany = false;
+    bool ustawpoziom = false;
+
+    bool taknie = false;
 
 
 
-    KoniecGry ekranKoniecGry(szerokoscOkna, wysokoscOkna);
-    Wygrana ekranWygrana(szerokoscOkna, wysokoscOkna);
-
-
-    //-------------------------------
-    WybórPoziomuTrudnoœci wyborPoziomu; // Tworzymy obiekt wyboru poziomu trudnoœci
     PoziomTrudnosci poziomTrudnosci = LATWY; // Domyœlnie ustawiamy poziom na ³atwy
 
     // Funkcja pomocnicza do generowania cegie³ek
@@ -849,15 +751,15 @@ int main() {
         // Zmiana liczby cegie³ek w zale¿noœci od poziomu trudnoœci
         switch (poziom) {
         case LATWY:
-            liczbaCegielekX = 8;
+            liczbaCegielekX = 11;
             liczbaCegielekY = 3;
             break;
         case SREDNI:
-            liczbaCegielekX = 10;
+            liczbaCegielekX = 11;
             liczbaCegielekY = 4;
             break;
         case TRUDNY:
-            liczbaCegielekX = 12;
+            liczbaCegielekX = 11;
             liczbaCegielekY = 5;
             break;
         }
@@ -873,7 +775,7 @@ int main() {
         }
         };
 
-    //-------------------------------
+    generujCegielki(poziomTrudnosci);
 
     okno.setFramerateLimit(120);
 
@@ -895,7 +797,7 @@ int main() {
                     if (wybranaOpcja == 0) {
                         zegar.resetuj();
                         graRozpoczeta = true;
-                        koniecGry = false;
+                        generujCegielki(poziomTrudnosci);
                     }
                     else if (wybranaOpcja == 1) {
                         pokazInstrukcje2 = true;
@@ -920,8 +822,6 @@ int main() {
                             );
                         }
 
-                        pilka.ksztalt.setPosition(stanGry.pozycjaPilkiX, stanGry.pozycjaPilkiY);
-                        pilka.predkosc = { stanGry.predkoscPilkiX, stanGry.predkoscPilkiY };
                         paletka.ksztalt.setPosition(stanGry.pozycjaPaletkiX, stanGry.pozycjaPaletkiY);
 
                         // Ustawienie czasu gry z pliku
@@ -929,21 +829,19 @@ int main() {
 
                         graRozpoczeta = true;
 
-
-
                     }
-                    //-----------------------------------------
+
                     else if (wybranaOpcja == 4) {
                         poziomWybierany = true;
                     }
-                    //-----------------------------------------------
+
                 }
-                //---------------------------------------------
-                else if (zdarzenie.key.code == Keyboard::Escape) {
-                    if (/*graRozpoczeta ||*/ pokazInstrukcje2 /*|| koniecGry*/) {
+                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape)
+                    /*else if (zdarzenie.key.code == Keyboard::Escape)*/ {
+                    if (pokazInstrukcje2) {
                         graRozpoczeta = false;
-                        pokazInstrukcje2 = false;
                         koniecGry = false;
+                        pokazInstrukcje2 = false;
                     }
                 }
 
@@ -959,17 +857,34 @@ int main() {
                         graRozpoczeta = false;
                     }
                 }
-            }
+                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape)
+                    /*else if (zdarzenie.key.code == Keyboard::Escape)*/ {
+                    if (taknie) {
+                        // Jeœli instrukcja jest w³¹czona, ukryj j¹ i wznowij grê
+                        taknie = false;
+                        graRozpoczeta = true;
+                    }
+                    else if (graRozpoczeta) {
+                        // Jeœli gra jest aktywna, wstrzymaj j¹ i poka¿ instrukcjê
+                        taknie = true;
+                        graRozpoczeta = false;
+                    }
+                }
+                else if (zdarzenie.key.code == Keyboard::T) {
+                    if (taknie) {
+                        okno.close();
+                    }
+                }
 
+
+            }
+            //dodac w czasie gry
             if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::F2) {
                 // Przygotowanie stanu gry do zapisania
                 StanGry stanGry;
-                stanGry.pozycjaPilkiX = pilka.x();
-                stanGry.pozycjaPilkiY = pilka.y();
+
                 stanGry.pozycjaPaletkiX = paletka.x();
                 stanGry.pozycjaPaletkiY = paletka.y();
-                stanGry.predkoscPilkiX = pilka.predkosc.x;
-                stanGry.predkoscPilkiY = pilka.predkosc.y;
 
                 // Zapisanie aktualnego czasu gry
                 stanGry.czasGry = zegar.pobierzCzas();
@@ -1005,9 +920,9 @@ int main() {
                             zegar.resetuj();
                             graRozpoczeta = true;
                             koniecGry = false;
+
                             pokazInstrukcje = false;
                             pokazInstrukcje2 = false;
-                            //koniecGry = false;
                         }
                         else if (wybranaOpcja == 1) {
                             //powrot do menu
@@ -1026,13 +941,7 @@ int main() {
             }
             if (poziomWybierany) {
                 if (zdarzenie.type == sf::Event::KeyPressed) {
-                    if (zdarzenie.key.code == sf::Keyboard::Up) {
-                        wyborPoziomu.ruchWGore();
-                    }
-                    else if (zdarzenie.key.code == sf::Keyboard::Down) {
-                        wyborPoziomu.ruchWDol();
-                    }
-                    else if (zdarzenie.key.code == sf::Keyboard::Enter) {
+                    if (zdarzenie.key.code == sf::Keyboard::Enter) {
                         // Cyclicznie zmieniamy poziom trudnoœci
                         if (poziomTrudnosci == LATWY) {
                             poziomTrudnosci = SREDNI;
@@ -1058,12 +967,9 @@ int main() {
 
 
 
-
             if (cegielki.empty()) {
                 wygrana = true;
                 graRozpoczeta = false;
-                pokazInstrukcje = false;
-                pokazInstrukcje2 = false;
                 koniecGry = false;
             }
 
@@ -1073,9 +979,7 @@ int main() {
                     // Zresetuj flagi
                     wygrana = false;
                     graRozpoczeta = false;
-                    resetGry = true;
                     koniecGry = false;
-
 
                 }
                 zegar.resetuj();
@@ -1085,18 +989,8 @@ int main() {
                 paletka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna - 50);
                 cegielki.clear();
 
-                for (int iX = 0; iX < liczbaCegielekX; ++iX) {
-                    for (int iY = 0; iY < liczbaCegielekY; ++iY) {
-                        cegielki.emplace_back(
-                            (iX + 1) * (szerokoscCegielki + 3) + 22,
-                            (iY + 2) * (wysokoscCegielki + 3)
-                        );
-                    }
-                }
+                generujCegielki(poziomTrudnosci);
             }
-
-
-
 
         }
 
@@ -1113,6 +1007,10 @@ int main() {
             instrukcja2.rysuj(okno);
         }
 
+        else if (taknie) {
+            opuscProgram.rysuj(okno);
+        }
+
         else if (wygrana) {
             ekranWygrana.rysuj(okno);
         }
@@ -1121,25 +1019,6 @@ int main() {
             zegar.resetuj();
             ekranKoniecGry.rysuj(okno);
         }
-        else if (resetGry) {
-
-            menu.rysuj(okno);
-            wygrana = false;
-            graRozpoczeta = false;
-            resetGry = false;
-            koniecGry = false;
-
-
-        }
-
-        if (poziomWybierany) {
-            wyborPoziomu.rysuj(okno);
-        }
-        //else {
-        //    // Tutaj mo¿esz rozpocz¹æ grê z wybranym poziomem trudnoœci
-        //    // Na przyk³ad zmieniaj¹c prêdkoœæ pi³ki, liczbê cegie³ek, itp.
-        //}
-
 
         else if (!graRozpoczeta && !koniecGry) {
             menu.rysuj(okno);
@@ -1170,17 +1049,10 @@ int main() {
                 paletka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna - 50);
                 cegielki.clear();
 
-                for (int iX = 0; iX < liczbaCegielekX; ++iX) {
-                    for (int iY = 0; iY < liczbaCegielekY; ++iY) {
-                        cegielki.emplace_back(
-                            (iX + 1) * (szerokoscCegielki + 3) + 22,
-                            (iY + 2) * (wysokoscCegielki + 3)
-                        );
-                    }
-                }
+                generujCegielki(poziomTrudnosci);
+
                 graRozpoczeta = false;
                 koniecGry = true;
-
 
 
             }
