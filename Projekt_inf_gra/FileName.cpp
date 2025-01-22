@@ -10,10 +10,14 @@ using namespace sf;
 
 //Definicje sta³ych
 constexpr int szerokoscOkna{ 800 }, wysokoscOkna{ 600 };
-constexpr float promienPilki{ 10.f }, predkoscPilki{ 4.0f };
-constexpr float szerokoscPaletki{ 100.f }, wysokoscPaletki{ 20.f }, predkoscPaletki{ 8.0f };
+constexpr float promienPilki{ 10.f }, predkoscPilki{ 4.f };
+constexpr float szerokoscPaletki{ 150.f }, wysokoscPaletki{ 20.f }, predkoscPaletki{ 10.0f };
 constexpr float szerokoscCegielki{ 60.f }, wysokoscCegielki{ 20.f };
 constexpr int liczbaCegielekX{ 11 }, liczbaCegielekY{ 4 };
+
+constexpr float szerokoscCegly{ 240.f }, wysokoscCegly{ 20.f };
+constexpr int liczbaCeglyX{ 1 }, liczbaCeglyY{ 1 };
+
 
 
 enum PoziomTrudnosci { LATWY, SREDNI, TRUDNY };
@@ -24,13 +28,13 @@ public:
     CircleShape ksztalt;
     Vector2f predkosc{ -predkoscPilki, -predkoscPilki };
 
-    sf::Texture tekstura3, tekstura4, teksturaAnimacji; // Dodanie tekstury dla animacji
+    sf::Texture tekstura3, tekstura4, teksturaAnimacji;
     sf::Sprite sprite;
-    bool pokazTekstura3 = true; // Flaga do zmiany tekstur
-    bool czyAnimacjaAktywna = false; // Flaga aktywnoœci animacji
-    sf::Clock zegar, zegarAnimacji;  // Zegar dla zmiany tekstur i animacji
-    float czasZmiany = 0.5f;         // Interwa³ zmiany tekstury
-    float czasAnimacji = 0.1f;       // Czas trwania animacji kolizji
+    bool pokazTekstura3 = true;
+    bool czyAnimacjaAktywna = false;
+    sf::Clock zegar, zegarAnimacji;
+    float czasZmiany = 0.5f;
+    float czasAnimacji = 0.1f;
 
     Pilka(float x, float y) {
         ksztalt.setPosition(x, y);
@@ -40,26 +44,26 @@ public:
 
         if (!tekstura3.loadFromFile("ballBlue.png") ||
             !tekstura4.loadFromFile("ballGrey.png") ||
-            !teksturaAnimacji.loadFromFile("wybuch.png")) { // Tekstura animacji
+            !teksturaAnimacji.loadFromFile("wybuch.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ tekstur!" << std::endl;
             exit(EXIT_FAILURE);
         }
 
-        sprite.setTexture(tekstura3); // Ustaw pocz¹tkow¹ teksturê
+        sprite.setTexture(tekstura3);
         sprite.setPosition(x, y);
     }
 
     void aktywujAnimacje() {
         czyAnimacjaAktywna = true;
         zegarAnimacji.restart();
-        sprite.setTexture(teksturaAnimacji); // Ustaw teksturê dla animacji
+        sprite.setTexture(teksturaAnimacji);
         sprite.setOrigin(teksturaAnimacji.getSize().x / 2.0f, teksturaAnimacji.getSize().y / 2.0f);
         sprite.setScale(
             2.0f * promienPilki / teksturaAnimacji.getSize().x,
             2.0f * promienPilki / teksturaAnimacji.getSize().y
 
         );
-        sprite.setPosition(ksztalt.getPosition()); // Ustaw poprawn¹ pozycjê sprite'a
+        sprite.setPosition(ksztalt.getPosition());
 
 
     }
@@ -68,30 +72,26 @@ public:
         ksztalt.move(predkosc);
         sprite.setPosition(ksztalt.getPosition());
 
-        // Obs³uga animacji kolizji
         if (czyAnimacjaAktywna) {
             if (zegarAnimacji.getElapsedTime().asSeconds() > czasAnimacji) {
-                czyAnimacjaAktywna = false; // Wy³¹cz animacjê po up³ywie czasu
-                sprite.setTexture(pokazTekstura3 ? tekstura3 : tekstura4); // Przywróæ cykliczn¹ zmianê tekstur
-                sprite.setScale(1.0f, 1.0f); // Przywróæ standardow¹ skalê
-                sprite.setOrigin(promienPilki, promienPilki); // Przywróæ œrodek na œrodek pi³ki
+                czyAnimacjaAktywna = false;
+                sprite.setTexture(pokazTekstura3 ? tekstura3 : tekstura4);
+                sprite.setScale(1.0f, 1.0f);
+                sprite.setOrigin(promienPilki, promienPilki);
             }
-            return; // Przerwij funkcjê, aby nie wykonywaæ dalszych operacji
+            return;
         }
 
-        // Odbicie od œcian bocznych
         if (lewo() < 0)
             predkosc.x = predkoscPilki;
         else if (prawo() > szerokoscOkna)
             predkosc.x = -predkoscPilki;
 
-        // Odbicie od górnej œciany
         if (gora() < 0)
             predkosc.y = predkoscPilki;
         else if (dol() > wysokoscOkna)
             predkosc.y = -predkoscPilki;
 
-        // Zmiana tekstur cyklicznie, jeœli animacja nie jest aktywna
         if (zegar.getElapsedTime().asSeconds() > czasZmiany) {
             if (pokazTekstura3) {
                 sprite.setTexture(tekstura4);
@@ -120,12 +120,10 @@ public:
 
 
 
-// Klasa bazowa reprezentuj¹ca prostok¹t (u¿ywana przez paletkê i cegie³ki)
 class Prostokat {
 public:
     RectangleShape ksztalt;
 
-    // Dodano 'const' na koñcu funkcji
     float x() const { return ksztalt.getPosition().x; }
     float y() const { return ksztalt.getPosition().y; }
     float lewo() const { return x() - ksztalt.getSize().x / 2.f; }
@@ -134,27 +132,25 @@ public:
     float dol() const { return y() + ksztalt.getSize().y / 2.f; }
 };
 
-// Klasa reprezentuj¹ca paletkê
 class Paletka : public Prostokat {
 public:
     Vector2f predkosc;
-    Texture tekstura5; // Zmienna do przechowywania tekstury
+    Texture tekstura5;
 
     Paletka(float x, float y) {
         ksztalt.setPosition(x, y);
         ksztalt.setSize({ szerokoscPaletki, wysokoscPaletki });
         ksztalt.setFillColor(Color::Red);
-        // Za³aduj teksturê i przypisz j¹ do obiektu ksztalt
+
         if (!tekstura5.loadFromFile("paddleRed.png")) {
-            // Obs³uga b³êdu, jeœli tekstura siê nie za³aduje
+
             std::cout << "Nie uda³o siê za³adowaæ tekstury!" << std::endl;
         }
-        ksztalt.setTexture(&tekstura5); // Przypisanie tekstury do kszta³tu
+        ksztalt.setTexture(&tekstura5);
 
         ksztalt.setOrigin(szerokoscPaletki / 2.f, wysokoscPaletki / 2.f);
     }
 
-    // Aktualizacja pozycji paletki na podstawie wciskanych klawiszy
     void aktualizuj() {
         ksztalt.move(predkosc);
 
@@ -173,14 +169,11 @@ public:
     bool zniszczona{ false };
     bool aktywna{ true };
 
-    // Statyczne zmienne przechowuj¹ce tekstury
     static sf::Texture texture1;
     static sf::Texture texture2;
 
-    // Konstruktor przyjmuj¹cy trzy argumenty: x, y, aktywna
     Cegielka(float x, float y, bool aktywna = true) {
-        // Losowanie tekstury
-        int randomIndex = rand() % 2;  // Losuj 0 lub 1
+        int randomIndex = rand() % 2;
 
         if (randomIndex == 0) {
             ksztalt.setTexture(&texture1);
@@ -193,10 +186,9 @@ public:
         ksztalt.setSize({ szerokoscCegielki, wysokoscCegielki });
         ksztalt.setOrigin(szerokoscCegielki / 2.f, wysokoscCegielki / 2.f);
 
-        this->aktywna = aktywna;  // Ustawienie wartoœci aktywnoœci cegie³ki
+        this->aktywna = aktywna;
     }
 
-    // Statyczna funkcja do za³adowania tekstur
     static void loadTextures() {
         if (!texture1.loadFromFile("block.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ block1.png!" << std::endl;
@@ -209,14 +201,10 @@ public:
 
 };
 
-// Inicjalizacja statycznych zmiennych tekstur
 sf::Texture Cegielka::texture1;
 sf::Texture Cegielka::texture2;
 
 
-
-
-// Funkcja szablonowa do sprawdzania kolizji
 template <class T1, class T2>
 bool czyKolizja(T1& obiektA, T2& obiektB) {
     return obiektA.prawo() >= obiektB.lewo() && obiektA.lewo() <= obiektB.prawo() &&
@@ -233,11 +221,9 @@ void testujKolizje(Paletka& paletka, Pilka& pilka) {
     else
         pilka.predkosc.x = predkoscPilki;
 
-    pilka.aktywujAnimacje(); // Aktywuj animacjê po kolizji
+    pilka.aktywujAnimacje();
 }
 
-
-// Funkcja obs³uguj¹ca kolizjê miêdzy cegie³k¹ a pi³k¹
 void testujKolizje(Cegielka& cegielka, Pilka& pilka) {
     if (!czyKolizja(cegielka, pilka)) return;
     cegielka.zniszczona = true;
@@ -258,10 +244,9 @@ void testujKolizje(Cegielka& cegielka, Pilka& pilka) {
     else
         pilka.predkosc.y = pilkaZGory ? -predkoscPilki : predkoscPilki;
 
-    pilka.aktywujAnimacje(); // Aktywuj animacjê po kolizji
+    pilka.aktywujAnimacje();
 }
 
-// Klasa do wyœwietlania ekranu "Koniec Gry"
 class KoniecGry {
 public:
     Text tekstKoniecGry;
@@ -273,7 +258,6 @@ public:
             exit(EXIT_FAILURE);
         }
 
-        // £adowanie tekstury t³a
         if (!tloTekstura.loadFromFile("kosmos.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ tekstury t³a!" << std::endl;
             exit(EXIT_FAILURE);
@@ -310,17 +294,13 @@ public:
     }
 
     void rysuj(RenderWindow& okno) {
-        // Rysuj t³o
         okno.draw(tloSprite);
         okno.draw(tekstKoniecGry);
 
-
-        // Rysuj opcje menu
         for (int i = 0; i < MAX_OPCJE; ++i) {
             okno.draw(opcje[i]);
         }
     }
-
 
 
     void ruchWGore() {
@@ -349,16 +329,11 @@ private:
     Text opcje[MAX_OPCJE];
 
 
-    // Nowe pola dla t³a
     sf::Texture tloTekstura;
     sf::Sprite tloSprite;
 };
 
 
-
-
-
-// Klasa obs³uguj¹ca menu g³ówne
 class Menu {
 public:
     Menu(float szerokosc, float wysokosc) {
@@ -366,7 +341,6 @@ public:
             exit(EXIT_FAILURE);
         }
 
-        // £adowanie tekstury t³a
         if (!tloTekstura.loadFromFile("banner.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ tekstury t³a!" << std::endl;
             exit(EXIT_FAILURE);
@@ -389,25 +363,24 @@ public:
         opcje[2].setString("Wczytaj gre");
         opcje[2].setPosition(Vector2f(szerokosc / 2 - opcje[2].getGlobalBounds().width / 2, wysokosc / (MAX_OPCJE + 1) * 3));
 
-        opcje[3].setFont(czcionka);
-        opcje[3].setFillColor(Color::Blue);
-        opcje[3].setString("Wyjdz");
-        opcje[3].setPosition(Vector2f(szerokosc / 2 - opcje[3].getGlobalBounds().width / 2, wysokosc / (MAX_OPCJE + 1) * 3.5));
-        //------------------------------
         opcje[4].setFont(czcionka);
         opcje[4].setFillColor(Color::Blue);
-        opcje[4].setString("Poziom");
+        opcje[4].setString("Wyjdz");
         opcje[4].setPosition(Vector2f(szerokosc / 2 - opcje[4].getGlobalBounds().width / 2, wysokosc / (MAX_OPCJE + 1) * 4));
+        //------------------------------
+        opcje[3].setFont(czcionka);
+        opcje[3].setFillColor(Color::Blue);
+        opcje[3].setString("Poziom");
+        opcje[3].setPosition(Vector2f(szerokosc / 2 - opcje[3].getGlobalBounds().width / 2, wysokosc / (MAX_OPCJE + 1) * 3.5));
         //-----------------------------
 
         wybranaOpcja = 0;
     }
 
     void rysuj(RenderWindow& okno) {
-        // Rysuj t³o
+
         okno.draw(tloSprite);
 
-        // Rysuj opcje menu
         for (int i = 0; i < MAX_OPCJE; ++i) {
             okno.draw(opcje[i]);
         }
@@ -439,7 +412,7 @@ private:
     Text opcje[MAX_OPCJE];
     Font czcionka;
 
-    // Nowe pola dla t³a
+
     sf::Texture tloTekstura;
     sf::Sprite tloSprite;
 };
@@ -448,81 +421,72 @@ private:
 
 class Instrukcja {
 public:
-    // Konstruktor wczytuj¹cy teksturê i tworz¹cy sprite
+
     Instrukcja(const std::string&) {
         if (!tekstura.loadFromFile("arkanoid_readme_image1.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ obrazka instrukcji!" << std::endl;
         }
-        sprite.setTexture(tekstura);  // Przypisanie tekstury do sprite'a
-        sprite.setPosition(0, 0);  // Ustawienie pozycji obrazka
+        sprite.setTexture(tekstura);
+        sprite.setPosition(0, 0);
     }
 
-    // Funkcja do rysowania instrukcji
     void rysuj(RenderWindow& okno) {
-        okno.draw(sprite);  // Rysowanie sprite'a z instrukcj¹
+        okno.draw(sprite);
     }
 
 private:
-    sf::Texture tekstura;  // Zmienna przechowuj¹ca teksturê
-    sf::Sprite sprite;     // Zmienna przechowuj¹ca sprite (do wyœwietlania obrazka)
+    sf::Texture tekstura;
+    sf::Sprite sprite;
 };
 
 class Instrukcja2 {
 public:
-    // Konstruktor wczytuj¹cy teksturê i tworz¹cy sprite
+
     Instrukcja2(const std::string&) {
         if (!tekstura.loadFromFile("arkanoid_readme_image1.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ obrazka instrukcji!" << std::endl;
         }
-        sprite.setTexture(tekstura);  // Przypisanie tekstury do sprite'a
-        sprite.setPosition(0, 0);  // Ustawienie pozycji obrazka
+        sprite.setTexture(tekstura);
+        sprite.setPosition(0, 0);
     }
 
-    // Funkcja do rysowania instrukcji
     void rysuj(RenderWindow& okno) {
-        okno.draw(sprite);  // Rysowanie sprite'a z instrukcj¹
+        okno.draw(sprite);
     }
 
 private:
-    sf::Texture tekstura;  // Zmienna przechowuj¹ca teksturê
-    sf::Sprite sprite;     // Zmienna przechowuj¹ca sprite (do wyœwietlania obrazka)
+    sf::Texture tekstura;
+    sf::Sprite sprite;
 };
 
 
 class StanGry {
 public:
 
-    // Pozycje paletki
     float pozycjaPaletkiX;
     float pozycjaPaletkiY;
 
+    float czasGry;
 
-    // Czas gry
-    float czasGry;  // Czas gry w sekundach
-
-    // Dane cegie³ek (pozycje i aktywnoœæ)
     struct Cegielka {
         float x, y;
         bool aktywna;
     };
     std::vector<Cegielka> cegielki;
 
-    // Funkcja zapisuj¹ca stan gry do pliku
+
     void zapiszStanDoPliku(const std::string& Nazwapliku) {
         std::ofstream plik(Nazwapliku);
         if (plik.is_open()) {
             ;
 
-            // Zapis paletki
             plik << pozycjaPaletkiX << " " << pozycjaPaletkiY << std::endl;
 
-            // Zapis cegie³ek
-            plik << cegielki.size() << std::endl; // Liczba cegie³ek
+            plik << cegielki.size() << std::endl;
             for (const auto& cegielka : cegielki) {
                 plik << cegielka.x << " " << cegielka.y << " " << cegielka.aktywna << std::endl;
             }
 
-            // Zapis czasu gry
             plik << czasGry << std::endl;
 
             plik.close();
@@ -533,25 +497,21 @@ public:
         }
     }
 
-    // Funkcja odczytuj¹ca stan gry z pliku
     void odczytajStanZPliku(const std::string& Nazwapliku) {
         std::ifstream plik(Nazwapliku);
         if (plik.is_open()) {
 
-            // Odczyt paletki
             plik >> pozycjaPaletkiX >> pozycjaPaletkiY;
 
-            // Odczyt cegie³ek
             cegielki.clear();
             size_t liczbaCegielek;
-            plik >> liczbaCegielek; // Odczytaj liczbê cegie³ek
+            plik >> liczbaCegielek;
             for (size_t i = 0; i < liczbaCegielek; ++i) {
                 Cegielka cegielka;
                 plik >> cegielka.x >> cegielka.y >> cegielka.aktywna;
                 cegielki.push_back(cegielka);
             }
 
-            // Odczyt czasu gry
             plik >> czasGry;
 
             plik.close();
@@ -572,7 +532,7 @@ public:
     sf::Time czasGry;
     sf::Font czcionka;
 
-    Zegar() {  // Domyœlnie gra trwa
+    Zegar() {
         if (!czcionka.loadFromFile("freshface.ttf")) {
             std::cerr << "Nie uda³o siê za³adowaæ czcionki!" << std::endl;
             exit(EXIT_FAILURE);
@@ -584,10 +544,9 @@ public:
     }
 
     void aktualizuj() {
-        // Dodaj up³ywaj¹cy czas do ca³kowitego czasu gry, tylko jeœli gra trwa
+
         czasGry += zegar.restart();
 
-        // Aktualizuj tekst czasu
         tekstCzasu.setString("Czas: " + std::to_string(static_cast<int>(czasGry.asSeconds())));
     }
 
@@ -596,11 +555,9 @@ public:
     }
 
     void resetuj() {
-        zegar.restart();       // Restartuje zegar SFML, aby zacz¹³ liczyæ czas od nowa
-        czasGry = sf::Time::Zero;  // Zresetowanie czasu gry
+        zegar.restart();
+        czasGry = sf::Time::Zero;
     }
-
-
 
     float pobierzCzas() const {
         return czasGry.asSeconds();
@@ -618,7 +575,6 @@ public:
             exit(EXIT_FAILURE);
         }
 
-        // £adowanie tekstury t³a
         if (!tloTekstura.loadFromFile("kosmos.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ tekstury t³a!" << std::endl;
             exit(EXIT_FAILURE);
@@ -626,14 +582,12 @@ public:
 
         tloSprite.setTexture(tloTekstura);
 
-        // Konfiguracja tekstu "Wygrana"
         tekstWygrana.setFont(czcionka);
         tekstWygrana.setString("Wygrana");
         tekstWygrana.setCharacterSize(100);
         tekstWygrana.setFillColor(Color::Red);
         tekstWygrana.setPosition(szerokosc / 2 - tekstWygrana.getGlobalBounds().width / 2, wysokosc / 4);
 
-        // Konfiguracja tekstu instrukcji
         tekstInstrukcja.setFont(czcionka);
         tekstInstrukcja.setString("Naciœnij Enter, aby wróciæ do menu");
         tekstInstrukcja.setCharacterSize(30);
@@ -642,10 +596,8 @@ public:
     }
 
     void rysuj(RenderWindow& okno) {
-        // Rysuj t³o
-        okno.draw(tloSprite);
 
-        // Rysuj teksty
+        okno.draw(tloSprite);
         okno.draw(tekstWygrana);
         okno.draw(tekstInstrukcja);
     }
@@ -666,7 +618,6 @@ public:
             exit(EXIT_FAILURE);
         }
 
-        // £adowanie tekstury t³a
         if (!tloTekstura.loadFromFile("kosmos.png")) {
             std::cerr << "Nie uda³o siê za³adowaæ tekstury t³a!" << std::endl;
             exit(EXIT_FAILURE);
@@ -674,14 +625,12 @@ public:
 
         tloSprite.setTexture(tloTekstura);
 
-        // Konfiguracja tekstu "Wygrana"
         tekstOpuscprogram.setFont(czcionka);
         tekstOpuscprogram.setString("Chcesz wyjsc z gry?");
         tekstOpuscprogram.setCharacterSize(100);
         tekstOpuscprogram.setFillColor(Color::Red);
         tekstOpuscprogram.setPosition(szerokosc / 2 - tekstOpuscprogram.getGlobalBounds().width / 2, wysokosc / 4);
 
-        // Konfiguracja tekstu instrukcji
         tekstInstrukcja.setFont(czcionka);
         tekstInstrukcja.setString("Tak - kliknij T / Nie - kliknij Escape");
         tekstInstrukcja.setCharacterSize(30);
@@ -690,10 +639,8 @@ public:
     }
 
     void rysuj(RenderWindow& okno) {
-        // Rysuj t³o
-        okno.draw(tloSprite);
 
-        // Rysuj teksty
+        okno.draw(tloSprite);
         okno.draw(tekstOpuscprogram);
         okno.draw(tekstInstrukcja);
     }
@@ -704,18 +651,72 @@ private:
 };
 
 
+class Cegla : public Prostokat {
+public:
+
+    static sf::Texture texture1;
+
+
+    Cegla(float x, float y) {
+
+        ksztalt.setTexture(&texture1);
+
+
+        ksztalt.setPosition(x, y);
+        ksztalt.setSize({ szerokoscCegly, wysokoscCegly });
+        ksztalt.setOrigin(szerokoscCegly / 2.f, wysokoscCegly / 2.f);
+
+    }
+
+    static void loadTextures() {
+        if (!texture1.loadFromFile("platform.png")) {
+            std::cerr << "Nie uda³o siê za³adowaæ block1.png!" << std::endl;
+        }
+    }
+    void rysuj(sf::RenderWindow& okno) {
+        okno.draw(ksztalt);
+    }
+};
+
+
+sf::Texture Cegla::texture1;
+
+
+void testujKolizje(Cegla& cegla, Pilka& pilka) {
+    if (!czyKolizja(cegla, pilka)) return;
+
+    float nakladanieLewo{ pilka.prawo() - cegla.lewo() };
+    float nakladaniePrawo{ cegla.prawo() - pilka.lewo() };
+    float nakladanieGora{ pilka.dol() - cegla.gora() };
+    float nakladanieDol{ cegla.dol() - pilka.gora() };
+
+    bool pilkaZLewej(abs(nakladanieLewo) < abs(nakladaniePrawo));
+    bool pilkaZGory(abs(nakladanieGora) < abs(nakladanieDol));
+
+    float minimalneNakladanieX{ pilkaZLewej ? nakladanieLewo : nakladaniePrawo };
+    float minimalneNakladanieY{ pilkaZGory ? nakladanieGora : nakladanieDol };
+
+    if (abs(minimalneNakladanieX) < abs(minimalneNakladanieY))
+        pilka.predkosc.x = pilkaZLewej ? -predkoscPilki : predkoscPilki;
+    else
+        pilka.predkosc.y = pilkaZGory ? -predkoscPilki : predkoscPilki;
+
+    pilka.aktywujAnimacje();
+}
+
+
 int main() {
 
     Cegielka::loadTextures();
+    Cegla::loadTextures();
 
     Instrukcja instrukcja("arkanoid_readme_image1.png");
     Instrukcja2 instrukcja2("arkanoid_readme_image1.png");
 
-    Zegar zegar; // Tworzenie zegara gry
+    Zegar zegar;
 
     RenderWindow okno(VideoMode(szerokoscOkna, wysokoscOkna), "Arkanoid");
 
-    // Inicjalizacja menu, paletki, pi³ki i cegie³ek
     Menu menu(szerokoscOkna, wysokoscOkna);
     Pilka pilka(szerokoscOkna / 2, wysokoscOkna / 2);
     Paletka paletka(szerokoscOkna / 2, wysokoscOkna - 50);
@@ -726,6 +727,7 @@ int main() {
 
 
     std::vector<Cegielka> cegielki;
+
 
     bool graRozpoczeta = false;
     bool pokazInstrukcje = false;
@@ -739,16 +741,19 @@ int main() {
 
 
 
-    PoziomTrudnosci poziomTrudnosci = LATWY; // Domyœlnie ustawiamy poziom na ³atwy
+    PoziomTrudnosci poziomTrudnosci = LATWY;
 
-    // Funkcja pomocnicza do generowania cegie³ek
+    std::vector<Cegla> cegly;
+    cegly.emplace_back(200.f, 200.f);
+    cegly.emplace_back(600.f, 250.f);
+
+
     auto generujCegielki = [&](PoziomTrudnosci poziom) {
-        cegielki.clear(); // Wyczyœæ istniej¹ce cegie³ki
+        cegielki.clear();
 
         int liczbaCegielekX = 0;
         int liczbaCegielekY = 0;
 
-        // Zmiana liczby cegie³ek w zale¿noœci od poziomu trudnoœci
         switch (poziom) {
         case LATWY:
             liczbaCegielekX = 11;
@@ -764,7 +769,6 @@ int main() {
             break;
         }
 
-        // Generowanie cegie³ek w oparciu o wybrany poziom
         for (int iX = 0; iX < liczbaCegielekX; ++iX) {
             for (int iY = 0; iY < liczbaCegielekY; ++iY) {
                 cegielki.emplace_back(
@@ -802,7 +806,7 @@ int main() {
                     else if (wybranaOpcja == 1) {
                         pokazInstrukcje2 = true;
                     }
-                    else if (wybranaOpcja == 3) {
+                    else if (wybranaOpcja == 4) {
                         okno.close();
 
                     }
@@ -812,7 +816,6 @@ int main() {
                         StanGry stanGry;
                         stanGry.odczytajStanZPliku("stan_gry.txt");
 
-                        // Przywracanie stanu cegie³ek
                         cegielki.clear();
                         for (const auto& stanCegielki : stanGry.cegielki) {
                             cegielki.emplace_back(
@@ -824,20 +827,18 @@ int main() {
 
                         paletka.ksztalt.setPosition(stanGry.pozycjaPaletkiX, stanGry.pozycjaPaletkiY);
 
-                        // Ustawienie czasu gry z pliku
-                        zegar.czasGry = sf::seconds(stanGry.czasGry);  // Odczytaj czas i przypisz do zegara
+                        zegar.czasGry = sf::seconds(stanGry.czasGry);
 
                         graRozpoczeta = true;
 
                     }
 
-                    else if (wybranaOpcja == 4) {
+                    else if (wybranaOpcja == 3) {
                         poziomWybierany = true;
                     }
 
                 }
-                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape)
-                    /*else if (zdarzenie.key.code == Keyboard::Escape)*/ {
+                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape) {
                     if (pokazInstrukcje2) {
                         graRozpoczeta = false;
                         koniecGry = false;
@@ -847,25 +848,20 @@ int main() {
 
                 else if (zdarzenie.key.code == Keyboard::F1) {
                     if (pokazInstrukcje) {
-                        // Jeœli instrukcja jest w³¹czona, ukryj j¹ i wznowij grê
                         pokazInstrukcje = false;
                         graRozpoczeta = true;
                     }
                     else if (graRozpoczeta) {
-                        // Jeœli gra jest aktywna, wstrzymaj j¹ i poka¿ instrukcjê
                         pokazInstrukcje = true;
                         graRozpoczeta = false;
                     }
                 }
-                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape)
-                    /*else if (zdarzenie.key.code == Keyboard::Escape)*/ {
+                if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Escape) {
                     if (taknie) {
-                        // Jeœli instrukcja jest w³¹czona, ukryj j¹ i wznowij grê
                         taknie = false;
                         graRozpoczeta = true;
                     }
                     else if (graRozpoczeta) {
-                        // Jeœli gra jest aktywna, wstrzymaj j¹ i poka¿ instrukcjê
                         taknie = true;
                         graRozpoczeta = false;
                     }
@@ -875,21 +871,16 @@ int main() {
                         okno.close();
                     }
                 }
-
-
             }
-            //dodac w czasie gry
+
             if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::F2) {
-                // Przygotowanie stanu gry do zapisania
                 StanGry stanGry;
 
                 stanGry.pozycjaPaletkiX = paletka.x();
                 stanGry.pozycjaPaletkiY = paletka.y();
 
-                // Zapisanie aktualnego czasu gry
                 stanGry.czasGry = zegar.pobierzCzas();
 
-                // Zapisanie stanu cegie³ek
                 stanGry.cegielki.clear();
                 for (const auto& cegielka : cegielki) {
                     StanGry::Cegielka stanCegielki = {
@@ -900,11 +891,9 @@ int main() {
                     stanGry.cegielki.push_back(stanCegielki);
                 }
 
-                // Zapis stanu gry do pliku
                 stanGry.zapiszStanDoPliku("stan_gry.txt");
                 std::cout << "Stan gry zapisany do pliku stan_gry.txt" << std::endl;
             }
-
 
             if (koniecGry) {
                 if (zdarzenie.type == Event::KeyPressed) {
@@ -925,7 +914,6 @@ int main() {
                             pokazInstrukcje2 = false;
                         }
                         else if (wybranaOpcja == 1) {
-                            //powrot do menu
                             graRozpoczeta = false;
                             koniecGry = false;
                             pokazInstrukcje = false;
@@ -942,7 +930,7 @@ int main() {
             if (poziomWybierany) {
                 if (zdarzenie.type == sf::Event::KeyPressed) {
                     if (zdarzenie.key.code == sf::Keyboard::Enter) {
-                        // Cyclicznie zmieniamy poziom trudnoœci
+
                         if (poziomTrudnosci == LATWY) {
                             poziomTrudnosci = SREDNI;
                             std::cout << "Wybrano poziom trudnosci: Sredni" << std::endl;
@@ -956,11 +944,10 @@ int main() {
                             std::cout << "Wybrano poziom trudnosci: Latwy" << std::endl;
                         }
 
-                        // Ustawienie liczby cegie³ek w zale¿noœci od poziomu trudnoœci
-                        generujCegielki(poziomTrudnosci);  // Funkcja generuj¹ca cegie³ki
+                        generujCegielki(poziomTrudnosci);
 
-                        // Zatwierdzenie wyboru poziomu trudnoœci i przejœcie do kolejnej czêœci gry
-                        poziomWybierany = false; // Zatwierdzamy wybór poziomu trudnoœci
+
+                        poziomWybierany = false;
                     }
                 }
             }
@@ -976,14 +963,12 @@ int main() {
 
             if (wygrana) {
                 if (zdarzenie.type == sf::Event::KeyPressed && zdarzenie.key.code == sf::Keyboard::Enter) {
-                    // Zresetuj flagi
                     wygrana = false;
                     graRozpoczeta = false;
                     koniecGry = false;
 
                 }
                 zegar.resetuj();
-                // Przegrana
                 pilka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna / 2);
                 pilka.predkosc = { -predkoscPilki, -predkoscPilki };
                 paletka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna - 50);
@@ -1025,6 +1010,11 @@ int main() {
         }
 
         else if (graRozpoczeta) {
+
+            for (auto& cegla : cegly) {
+                testujKolizje(cegla, pilka);
+            }
+
             pilka.aktualizuj();
             paletka.aktualizuj();
             zegar.aktualizuj();
@@ -1043,7 +1033,6 @@ int main() {
 
             if (pilka.dol() > wysokoscOkna) {
 
-                // Przegrana
                 pilka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna / 2);
                 pilka.predkosc = { -predkoscPilki, -predkoscPilki };
                 paletka.ksztalt.setPosition(szerokoscOkna / 2, wysokoscOkna - 50);
@@ -1063,6 +1052,11 @@ int main() {
                 for (const auto& cegielka : cegielki) {
                     okno.draw(cegielka.ksztalt);
                 }
+
+                for (const auto& cegla : cegly) {
+                    okno.draw(cegla.ksztalt);
+                }
+
             }
         }
 
