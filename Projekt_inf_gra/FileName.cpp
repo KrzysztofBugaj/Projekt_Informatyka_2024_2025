@@ -10,7 +10,7 @@ using namespace sf;
 
 //Definicje sta³ych
 constexpr int szerokoscOkna{ 800 }, wysokoscOkna{ 600 };
-constexpr float promienPilki{ 10.f }, predkoscPilki{ 4.f };
+constexpr float promienPilki{ 10.f }, predkoscPilki{ 3.f };
 constexpr float szerokoscPaletki{ 150.f }, wysokoscPaletki{ 20.f }, predkoscPaletki{ 10.0f };
 constexpr float szerokoscCegielki{ 60.f }, wysokoscCegielki{ 20.f };
 constexpr int liczbaCegielekX{ 11 }, liczbaCegielekY{ 4 };
@@ -34,7 +34,7 @@ public:
     bool czyAnimacjaAktywna = false;
     sf::Clock zegar, zegarAnimacji;
     float czasZmiany = 0.5f;
-    float czasAnimacji = 0.1f;
+    float czasAnimacji = 0.2f;
 
     Pilka(float x, float y) {
         ksztalt.setPosition(x, y);
@@ -63,8 +63,8 @@ public:
             2.0f * promienPilki / teksturaAnimacji.getSize().y
 
         );
-        sprite.setPosition(ksztalt.getPosition());
 
+        sprite.setPosition(ksztalt.getPosition());
 
     }
 
@@ -79,7 +79,7 @@ public:
                 sprite.setScale(1.0f, 1.0f);
                 sprite.setOrigin(promienPilki, promienPilki);
             }
-            return;
+            /*           return;*/
         }
 
         if (lewo() < 0)
